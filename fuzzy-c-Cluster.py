@@ -17,13 +17,7 @@ data = Data.to_numpy()
 m = 2
 e = 0.001
 n = len(data)
-k = 2 
-
-
-te = initial_membership_matrix()
-ce = compute_centers(te)
-d = find_distances(ce)
-
+k = 2
 def initial_membership_matrix():
     membership_matrix = list()
     for i in range(n):
@@ -58,23 +52,35 @@ def find_distances(centers):
 def update_membership_matrix(dist,mem):
     dist = np.transpose(dist)
     mem = np.array(mem)
+    p = float(2/(m-1))
     for i in range(n):
         for j in range(k):
             if dist[i][j] > 0:
                 val = dist[i][j]
-                su = 0
-                for l in range(k):
-                    su = su + (math.pow((val/dist[i][l]),(2/m-1)))
-                mem[i][j] = 1/su
-            else:
+                den = sum([math.pow(float(val/dist[i][c]), p) for c in range(k)])
+                mem[i][j] = float(1/den)       
+            elif dist[i][j] == 0:
                 mem[i][j] = 1
                 for s in range(k):
                     if(s != j):
                         mem[i][s] = 0              
-    return mem   
+    return mem 
 
-    
-    
+  
+def clustering():
+    new_u = initial_membership_matrix()
+    old_u = np.zeros_like(new_u)
+    i = 1
+    while not np.allclose(new_u,old_u):
+        i = i + 1
+        cen = compute_centers(new_u)
+        dis = find_distances(cen)
+        old_u = new_u
+        new_u = update_membership_matrix(dis,new_u)
+    return new_u
+
+
+fin = clustering()
 
     
     
