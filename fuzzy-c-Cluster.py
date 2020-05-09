@@ -66,7 +66,6 @@ def update_membership_matrix(dist,mem,k):
                         mem[i][s] = 0              
     return mem 
 
-  
 def clustering(k):
     new_u = initial_membership_matrix(k)
     old_u = np.zeros_like(new_u)
@@ -88,15 +87,34 @@ def objective_function(v,u,k):
             value = value + ((u[j][i])**m)*(np.dot(np.transpose(val),val))
     return value
 
+def R_objective_function(obj):
+    r = list()
+    le = len(obj)
+    for j in range(1,le-1):
+        r.append(abs((obj[j] - obj[j+1])/(obj[j-1] - obj[j])))
+    m = 2
+    mini = min(obj)
+    for j in obj:
+        if(mini == j):
+            va = m
+            break
+        m = m + 1
+    return r,va
+    
+    
+    
+    
+    
 obj = list()
 for k in range(2,13):
     v,u = clustering(k)
     objective_values = objective_function(v,u,k)
     obj.append(objective_values)
 
-print(obj) 
-    
+ob = obj[0:9]
+r_value,least = R_objective_function(ob)
 
 
 
-        
+
+
