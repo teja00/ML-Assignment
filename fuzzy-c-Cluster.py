@@ -18,7 +18,7 @@ m = 2
 e = 0.001
 n = len(data)
 k = 2
-def initial_membership_matrix():
+def initial_membership_matrix(k):
     membership_matrix = list()
     for i in range(n):
         rand_list = [random.random() for i in range(k)]
@@ -26,7 +26,7 @@ def initial_membership_matrix():
         temp_list = [x/summation for x in rand_list]
         membership_matrix.append(temp_list)
     return membership_matrix 
-def compute_centers(membership_matrix):
+def compute_centers(membership_matrix,k):
     v= list()
     for i in range(k):
         u = list()
@@ -37,7 +37,7 @@ def compute_centers(membership_matrix):
         x = [x/denominator for x in numerator]
         v.append(x)
     return v
-def find_distances(centers):
+def find_distances(centers,k):
     Dist = list()
     for i in range(k):
         li = list()
@@ -49,7 +49,7 @@ def find_distances(centers):
             li.append(dis)
         Dist.append(li)
     return Dist
-def update_membership_matrix(dist,mem):
+def update_membership_matrix(dist,mem,k):
     dist = np.transpose(dist)
     mem = np.array(mem)
     p = float(2/(m-1))
@@ -67,22 +67,34 @@ def update_membership_matrix(dist,mem):
     return mem 
 
   
-def clustering():
-    new_u = initial_membership_matrix()
+def clustering(k):
+    new_u = initial_membership_matrix(k)
     old_u = np.zeros_like(new_u)
     i = 1
     while not np.allclose(new_u,old_u):
         i = i + 1
-        cen = compute_centers(new_u)
-        dis = find_distances(cen)
+        cen = compute_centers(new_u,k)
+        dis = find_distances(cen,k)
         old_u = new_u
-        new_u = update_membership_matrix(dis,new_u)
-    return new_u
+        new_u = update_membership_matrix(dis,new_u,k)
+    return cen,new_u
 
 
-fin = clustering()
+def objective_function(v,u,k):
+    value = 0
+    for i in range(k):
+        for j in range(n):
+            val = np.subtract(data[j],v[i])
+            value = value + ((u[j][i])**m)*(np.dot(np.transpose(val),val))
+    return value
 
-    
+obj = list()
+for k in range(2,13):
+    v,u = clustering(k)
+    objective_values = objective_function(v,u,k)
+    obj.append(objective_values)
+
+print(obj) 
     
 
 
