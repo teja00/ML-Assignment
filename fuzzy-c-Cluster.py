@@ -10,10 +10,12 @@ import numpy as np
 import pandas as pd
 import random
 import math
-import operator
+import matplotlib.pyplot as plt
 
 Data = pd.read_excel("DataSets.xlsx",skip_blank_lines = False,error_bad_lines=False)
 data = Data.to_numpy()
+x_value = data[:,0]
+y_value = data[:,1]
 m = 2
 e = 0.001
 n = len(data)
@@ -76,7 +78,7 @@ def clustering(k):
         dis = find_distances(cen,k)
         old_u = new_u
         new_u = update_membership_matrix(dis,new_u,k)
-    return cen,new_u
+    return cen,new_u,i
 
 
 def objective_function(v,u,k):
@@ -92,9 +94,9 @@ def R_objective_function(obj):
     le = len(obj)
     for j in range(1,le-1):
         r.append(abs((obj[j] - obj[j+1])/(obj[j-1] - obj[j])))
-    m = 2
-    mini = min(obj)
-    for j in obj:
+    m = 3
+    mini = min(r)
+    for j in r:
         if(mini == j):
             va = m
             break
@@ -106,13 +108,28 @@ def R_objective_function(obj):
     
     
 obj = list()
+iteration = list()
 for k in range(2,13):
-    v,u = clustering(k)
+    v,u,iterations = clustering(k)
     objective_values = objective_function(v,u,k)
     obj.append(objective_values)
-
+    iteration.append(iterations)
+    
 ob = obj[0:9]
 r_value,least = R_objective_function(ob)
+v_min,u_min,it = clustering(least)
+
+c = [x for x in range(2,13)]
+fig,ax = plt.subplots()
+ax.plot(c, obj, color="red", marker="o")
+ax.set_xlabel("Value of C",fontsize=14)
+ax.set_ylabel("Value of objectiveFunction",color="red",fontsize=14)
+ax2=ax.twinx()
+ax2.plot(c,iteration,color="blue",marker="o")
+ax2.set_ylabel("No. of Iterations",color="blue",fontsize=14)
+plt.show()
+
+plt.scatter(x_value,y_value,c= u_min.argmax(axis=1))
 
 
 
