@@ -14,13 +14,18 @@ import matplotlib.pyplot as plt
 
 Data = pd.read_excel("DataSets.xlsx",skip_blank_lines = False,error_bad_lines=False)
 data = Data.to_numpy()
-x_value = data[:,0]
-y_value = data[:,1]
+#train_pct_index = int(0.8 * len(data))
+data_y = data[::5]
+data_x = data
+#data_x, data_y = data[:train_pct_index], data[train_pct_index:]
+
+x_value = data_x[:,0]
+y_value = data_x[:,1]
+
 m = 2
 e = 0.001
-n = len(data)
 k = 2
-def initial_membership_matrix(k):
+def initial_membership_matrix(k,n):
     membership_matrix = list()
     for i in range(n):
         rand_list = [random.random() for i in range(k)]
@@ -28,7 +33,7 @@ def initial_membership_matrix(k):
         temp_list = [x/summation for x in rand_list]
         membership_matrix.append(temp_list)
     return membership_matrix 
-def compute_centers(membership_matrix,k):
+def compute_centers(membership_matrix,k,data,n):
     v= list()
     for i in range(k):
         u = list()
@@ -39,7 +44,7 @@ def compute_centers(membership_matrix,k):
         x = [x/denominator for x in numerator]
         v.append(x)
     return v
-def find_distances(centers,k):
+def find_distances(centers,k,data,n):
     Dist = list()
     for i in range(k):
         li = list()
@@ -51,7 +56,7 @@ def find_distances(centers,k):
             li.append(dis)
         Dist.append(li)
     return Dist
-def update_membership_matrix(dist,mem,k):
+def update_membership_matrix(dist,mem,k,n):
     dist = np.transpose(dist)
     mem = np.array(mem)
     p = float(2/(m-1))
@@ -68,16 +73,16 @@ def update_membership_matrix(dist,mem,k):
                         mem[i][s] = 0              
     return mem 
 
-def clustering(k):
-    new_u = initial_membership_matrix(k)
+def clustering(k,n):
+    new_u = initial_membership_matrix(k,n)
     old_u = np.zeros_like(new_u)
     i = 1
     while not np.allclose(new_u,old_u):
         i = i + 1
-        cen = compute_centers(new_u,k)
-        dis = find_distances(cen,k)
+        cen = compute_centers(new_u,k,data_x,n)
+        dis = find_distances(cen,k,data_x,n)
         old_u = new_u
-        new_u = update_membership_matrix(dis,new_u,k)
+        new_u = update_membership_matrix(dis,new_u,k,n)
     return cen,new_u,i
 
 
@@ -102,22 +107,23 @@ def R_objective_function(obj):
             break
         m = m + 1
     return r,va
-    
-    
-    
-    
-    
+
+
+
+
+n = len(data_x)
 obj = list()
 iteration = list()
 for k in range(2,13):
-    v,u,iterations = clustering(k)
+    v,u,iterations = clustering(k,n)
     objective_values = objective_function(v,u,k)
     obj.append(objective_values)
     iteration.append(iterations)
     
 ob = obj[0:9]
 r_value,least = R_objective_function(ob)
-v_min,u_min,it = clustering(least)
+v_min,u_min,it = clustering(least,n)
+
 
 c = [x for x in range(2,13)]
 fig,ax = plt.subplots()
@@ -127,11 +133,21 @@ ax.set_ylabel("Value of objectiveFunction",color="red",fontsize=14)
 ax2=ax.twinx()
 ax2.plot(c,iteration,color="blue",marker="o")
 ax2.set_ylabel("No. of Iterations",color="blue",fontsize=14)
+
 plt.show()
 
-plt.scatter(x_value,y_value,c= u_min.argmax(axis=1))
+plt.scatter(x_value,y_value,c=u_min.argmax(axis=1))
+plt.show()
 
-
+print("this is after the data has been trained to get the centers ")
+length = len(data_y)
+final_mem = initial_membership_matrix(least,length)
+distance = find_distances(v_min,least,data_y,length)
+final_u = update_membership_matrix(distance,final_mem,least,length)
+k_value = data_y[:,0]
+l_value = data_y[:,1]
+plt.scatter(k_value,l_value,c=final_u.argmax(axis=1))
+plt.show()
 
 
 
