@@ -9,6 +9,7 @@ Created on Sat May  9 02:44:33 2020
 import numpy as np
 import pandas as pd
 import random
+import math
 
 Data = pd.read_excel("DataSets.xlsx",skip_blank_lines = False,error_bad_lines=False)
 data = Data.to_numpy()
@@ -26,4 +27,18 @@ def intial_membership_matrix():
         membership_matrix.append(temp_list)
     return membership_matrix
 
-te =intial_membership_matrix()
+def compute_centers(membership_matrix):
+    v= list()
+    for i in range(k):
+        u = list()
+        for j in range(n):
+            u.append(membership_matrix[j][i]**m)
+        denominator = sum(u)
+        numerator = np.dot(u,data)
+        x = [x/denominator for x in numerator]
+        v.append(x)
+    return v
+
+        
+            
+        
