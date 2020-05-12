@@ -12,10 +12,26 @@ import random
 import math
 import matplotlib.pyplot as plt
 
-Data = pd.read_excel("DataSets.xlsx",skip_blank_lines = False,error_bad_lines=False)
+Data = pd.read_excel("Assignment.xlsx",header = None)
 data = Data.to_numpy()
-#train_pct_index = int(0.8 * len(data))
-data_y = data[::5]
+data_train = list()
+for i in range(600):
+    data_train.append(data[i])
+data_test_end = list()
+for j in range(600,620):
+    data_test_end.append(data[i])
+data_train = np.array(data_train)
+data_test_end = np.array(data_test_end)
+
+data_train1 = list()
+data_neglect = data_train[::6]
+for i in range(600):
+    if(data_train[i] not in data_neglect):
+        data_train1.append(data_train[i])
+data_train = np.array(data_train1)
+data_test = np.concatenate((data_neglect, data_test_end), axis=0)
+
+data_y = data_test
 data_x = data
 #data_x, data_y = data[:train_pct_index], data[train_pct_index:]
 
