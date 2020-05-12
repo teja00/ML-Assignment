@@ -31,6 +31,12 @@ for i in range(600):
 data_train = np.array(data_train1)
 data_test = np.concatenate((data_neglect, data_test_end), axis=0)
 
+data_train_dataframe = pd.DataFrame(data_train)
+data_train_dataframe.to_excel('classification.xlsx',index = False,header =None)
+
+data_test_dataframe = pd.DataFrame(data_test)
+data_test_dataframe.to_excel('mining.xlsx',index = False,header = None)
+
 data_y = data_test
 data_x = data
 #data_x, data_y = data[:train_pct_index], data[train_pct_index:]
@@ -40,7 +46,7 @@ y_value = data_x[:,1]
 
 m = 2
 e = 0.001
-k = 2
+
 def initial_membership_matrix(k,n):
     membership_matrix = list()
     for i in range(n):
@@ -139,6 +145,8 @@ for k in range(2,13):
 ob = obj[0:9]
 r_value,least = R_objective_function(ob)
 v_min,u_min,it = clustering(least,n)
+centers_dataframe = pd.DataFrame(v_min)
+centers_dataframe.to_excel('centers.xlsx',index = False,header = None)
 
 
 c = [x for x in range(2,13)]
@@ -155,6 +163,8 @@ plt.show()
 plt.scatter(x_value,y_value,c=u_min.argmax(axis=1))
 plt.show()
 
+
+"""
 print("this is after the data has been trained to get the centers ")
 length = len(data_y)
 final_mem = initial_membership_matrix(least,length)
@@ -164,6 +174,5 @@ k_value = data_y[:,0]
 l_value = data_y[:,1]
 plt.scatter(k_value,l_value,c=final_u.argmax(axis=1))
 plt.show()
-
-
+"""
 
